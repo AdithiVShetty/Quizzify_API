@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Quizzify_BLL;
 using Quizzify_DAL;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +28,13 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromSeconds(1000); // Adjust the timeout as needed
 });
 // Configure the HTTP request pipeline.
+
+// Register IMemoryCache with the dependency injection container
+
+//builder.Services.AddMemoryCache();
+//// Register UserService with the dependency injection container
+
+//builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
 

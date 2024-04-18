@@ -5,6 +5,8 @@ using Quizzify_API.Models;
 using Quizzify_BLL;
 using System.Net.Mail;
 using System.Net;
+using Quizzify_API.Requests;
+using Quizzify_DAL;
 
 namespace Quizzify_API.Controllers
 {
@@ -56,46 +58,46 @@ namespace Quizzify_API.Controllers
             }
         }
         [HttpPost("RegisterForm")]
-       // [EnableCors("AllowReactApp")]
-        public IActionResult RegisterNewUser(String Name, String EmailId, String Password, String OrganisationName
-          , string PhoneNo)
+        // [EnableCors("AllowReactApp")]
+        public IActionResult RegisterNewUser([FromBody] UserProfileModel userProfile)
         {
             try
             {
-                bool IsUserAlreadyExist = userService.DoesUserExist(EmailId);
+                bool IsUserAlreadyExist = userService.DoesUserExist(userProfile.EmailId);
                 if (IsUserAlreadyExist)
                 {
                     return Ok("EmailId already exist....!! Try Loging In");
                 }
                 var userDTO = new UserDTO
                 {
-                    Name = Name,
-                    EmailId = EmailId,
-                    Password = Password,
-                    PhoneNumber = PhoneNo
+                    Name = userProfile.Name,
+                    EmailId = userProfile.EmailId,
+                    Password = userProfile.Password,
+                    PhoneNumber = userProfile.PhoneNumber
                 };
-                OrganisationDTO Organisation = userService.GetOrganisationByName(OrganisationName);
+                string organisationName = userProfile.OrganisationName;
+                OrganisationDTO organisationDTO = userService.GetOrganisationByName(organisationName);
+                OrganisationModel Organisation = mapper.Map<OrganisationModel>(organisationDTO);
                 if (Organisation == null)
                 {
-                    int id = userService.AddOrganisationName(OrganisationName);
+                    int id = userService.AddOrganisationName(userProfile.OrganisationName);
                     userDTO.OrganisationId = id;
                 }
                 else
                 {
                     userDTO.OrganisationId = Organisation.Id;
                 }
-
                 //userDTO.IsActive = true;
                 //userDTO.RoleId = 3;
                 bool result = userService.RegisterNewUser(userDTO);
                 if (result)
                 {
-                    List<string> adminEmails = userService.GetAdminEmailsByOrganisation(OrganisationName);
+                    List<string> adminEmails = userService.GetAdminEmailsByOrganisation(userProfile.OrganisationName);
 
                     // Send email to each admin
                     foreach (var adminEmail in adminEmails)
                     {
-                        SendNewUserAlertToAdmin(adminEmail, Name, EmailId, OrganisationName);
+                        SendNewUserAlertToAdmin(adminEmail, userProfile.Name, userProfile.EmailId, userProfile.OrganisationName);
                     }
                     return Ok("Data Inserted");
                 }
@@ -109,7 +111,8 @@ namespace Quizzify_API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("GetOrganisation")]
+        
+                [HttpGet("GetOrganisation")]
         public List<OrganisationModel> GetOrganisation()
         {
             List<OrganisationDTO> organisationDTO = userService.GetOrganisations();
@@ -118,55 +121,7 @@ namespace Quizzify_API.Controllers
 
         }
 
-        [HttpPost("forgotpassword")]
-        public IActionResult ForgotPassword(string email)
-        {
-            try
-            {
-                //string EmailID = email;
-
-                // Generate OTP (You can use any logic to generate OTP)
-                Random random = new Random();
-                string otp = random.Next(100000, 999999).ToString();
-
-                // Send OTP to email
-                SendEmail(email, otp);
-
-                // Store the OTP in session
-                HttpContext.Session.SetString("OTP", otp); // Assuming you're using ASP.NET Core and have session configured
-
-
-                return Ok(new { message = "OTP sent successfully", otp });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest("Failed to send OTP: " + ex.Message);
-            }
-        }
-
-        private void SendEmail(string email, string otp)
-        {
-            // Configure SMTP client (Update with your SMTP server details)
-            SmtpClient smtpClient = new SmtpClient("smtp-mail.outlook.com")
-            {
-                Port = 587,
-                Credentials = new NetworkCredential("xyz@gmail.com", "Xyz@123"),
-                EnableSsl = true
-            };
-
-            // Create email message
-            MailMessage mailMessage = new MailMessage
-            {
-                From = new MailAddress("xyz@gmail.com"),
-                Subject = "OTP for Password Reset",
-                Body = $"Your OTP is: {otp}"
-            };
-
-            mailMessage.To.Add(email);
-
-            // Send email
-            smtpClient.Send(mailMessage);
-        }
+        
 
         private void SendNewUserAlertToAdmin(string adminEmail, string Name, string EmailId, string OrganisationName)
         {
@@ -209,43 +164,9 @@ namespace Quizzify_API.Controllers
             smtpClient.Send(mailMessage);
         }
 
-        [HttpPost("validateOTP")]
-        public IActionResult VerifyOTP(string otp)
-        {
-            string storedOTP = HttpContext.Session.GetString("OTP");
+       
 
-            if (otp == storedOTP)
-            {
-                return Ok("Valid OTP");
-            }
-            else
-            {
-                return BadRequest("Invalid OTP");
-            }
-        }
-
-        [HttpPost("resetpassword")]
-        public IActionResult ResetPassword(string email, string newPassword)
-        {
-            try
-            {
-                //string email = data.email;
-                //string newPassword = data.newPassword;
-
-                if (userService.UpdatePassword(email, newPassword))
-                {
-                    return Ok("Password updated successfully.");
-                }
-                else
-                {
-                    return BadRequest("Failed to reset password");
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest("Failed to reset password: " + ex.Message);
-            }
-        }
+    
         [HttpGet("userprofile")]
         public IActionResult GetUserProfile(int userId)
         {

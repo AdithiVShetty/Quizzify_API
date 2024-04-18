@@ -1,6 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Quizzify_DAL;
+using System.Net.Mail;
+using System.Net;
+using System;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -9,6 +13,13 @@ namespace Quizzify_BLL
     public class UserService
     {
         private readonly IMapper mapper;
+        private readonly IMemoryCache _cache;
+        private readonly Random random = new Random();
+
+        public UserService(IMemoryCache cache)
+        {
+            _cache = cache;
+        }
         public UserService()
         {
             var mapConfig = new MapperConfiguration(cfg => {
@@ -49,11 +60,7 @@ namespace Quizzify_BLL
             int id = userDAL.AddOrganisationName(organisationName);
             return id;
         }
-        public bool UpdatePassword(string email, string newPassword)
-        {
-            UserDAL userDAL = new UserDAL(db);
-            return userDAL.UpdatePassword(email, newPassword);
-        }
+       
         public bool DoesUserExist(string email)
         {
             UserDAL userDAL = new UserDAL(db);
@@ -92,6 +99,7 @@ namespace Quizzify_BLL
                 throw new InvalidOperationException("Invalid EmailId or Password.");
             }
         }
+       
         public UserProfileDTO GetUserProfile(int userId)
         {
             UserDAL userDAL = new UserDAL(db);
