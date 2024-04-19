@@ -31,10 +31,10 @@ builder.Services.AddSession(options =>
 
 // Register IMemoryCache with the dependency injection container
 
-//builder.Services.AddMemoryCache();
-//// Register UserService with the dependency injection container
+builder.Services.AddMemoryCache();
+// Register UserService with the dependency injection container
 
-//builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
 

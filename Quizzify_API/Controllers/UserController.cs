@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Quizzify_API.Models;
 using Quizzify_BLL;
-using System.Net.Mail;
 using System.Net;
-using Quizzify_API.Requests;
-using Quizzify_DAL;
+using System.Net.Mail;
 
 namespace Quizzify_API.Controllers
 {
@@ -15,7 +12,9 @@ namespace Quizzify_API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IMapper mapper;
-        public UserController()
+        private readonly UserService userService;
+
+        public UserController(UserService _userService)
         {
             var mapConfig = new MapperConfiguration(cfg =>
             {
@@ -27,10 +26,9 @@ namespace Quizzify_API.Controllers
                 cfg.CreateMap<UserProfileModel, UserProfileDTO>();
             });
             mapper = mapConfig.CreateMapper();
+            userService = _userService;
         }
-        UserService userService = new UserService();
-
-        
+        //UserService userService = new UserService();
 
         [HttpPost("login")]
         public IActionResult PostLogin([FromBody] UserModel login)
@@ -73,7 +71,8 @@ namespace Quizzify_API.Controllers
                     Name = userProfile.Name,
                     EmailId = userProfile.EmailId,
                     Password = userProfile.Password,
-                    PhoneNumber = userProfile.PhoneNumber
+                    PhoneNumber = userProfile.PhoneNumber,
+                    
                 };
                 string organisationName = userProfile.OrganisationName;
                 OrganisationDTO organisationDTO = userService.GetOrganisationByName(organisationName);
@@ -111,8 +110,8 @@ namespace Quizzify_API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        
-                [HttpGet("GetOrganisation")]
+
+        [HttpGet("GetOrganisation")]
         public List<OrganisationModel> GetOrganisation()
         {
             List<OrganisationDTO> organisationDTO = userService.GetOrganisations();
@@ -121,25 +120,16 @@ namespace Quizzify_API.Controllers
 
         }
 
-        
-
         private void SendNewUserAlertToAdmin(string adminEmail, string Name, string EmailId, string OrganisationName)
         {
             // Configure SMTP client (Update with your SMTP server details)
             SmtpClient smtpClient = new SmtpClient("smtp-mail.outlook.com")
             {
                 Port = 587,
-                Credentials = new NetworkCredential("xyz@gmail.com", "Xyz@123"),
+                Credentials = new NetworkCredential("Gaurav.Tripathi@triconinfotech.com", "Secure@15$%"),
                 EnableSsl = true
             };
-            //string body = "Dear Admin,\n\n" +
-            //                "A new user has registered with the following details:\n" +
-            //                $"Name: {Name}\n" +
-            //                $"Email: {EmailId}\n" +
-            //                $"Organisation: {OrganisationName}\n\n" +
-            //                "Please take necessary action.\n\n" +
-            //                "Regards,\n" +
-            //                "Quizzify Team";
+
             string body =
                 "Dear Admin,<br><br>" +
               "A new user has registered with the following details:<br>" +
@@ -152,9 +142,9 @@ namespace Quizzify_API.Controllers
             // Create email message
             MailMessage mailMessage = new MailMessage
             {
-                From = new MailAddress("xyz@gmail.com"),
+                From = new MailAddress("Gaurav.Tripathi@triconinfotech.com"),
                 Subject = "New User Registration",
-                Body =  body,
+                Body = body,
                 IsBodyHtml = true
             };
             mailMessage.Body = $"<div style='color: #000;'>{mailMessage.Body}</div>";
@@ -164,16 +154,13 @@ namespace Quizzify_API.Controllers
             smtpClient.Send(mailMessage);
         }
 
-       
 
-    
         [HttpGet("userprofile")]
         public IActionResult GetUserProfile(int userId)
         {
             UserProfileDTO userProfileDTO = userService.GetUserProfile(userId);
             UserProfileModel userProfileModel = mapper.Map<UserProfileModel>(userProfileDTO);
             return Ok(userProfileModel);
-
         }
     }
 }

@@ -2,6 +2,10 @@
 {
     public class UserDTO
     {
+        public UserDTO()
+        {
+            IsActive = true;
+        }
         public int Id { get; set; }
         public string Name { get; set; }
         public string EmailId { get; set; }

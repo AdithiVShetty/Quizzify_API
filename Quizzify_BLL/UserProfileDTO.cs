@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Quizzify_BLL
+﻿namespace Quizzify_BLL
 {
     public class UserProfileDTO
     {
@@ -15,5 +9,6 @@ namespace Quizzify_BLL
         public string OrganisationName { get; set; }
         public string? PhoneNumber { get; set; }
         public string? RoleName { get; set; }
+        public bool IsActive { get; set; }
     }
 }

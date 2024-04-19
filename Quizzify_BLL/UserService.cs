@@ -2,9 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Quizzify_DAL;
-using System.Net.Mail;
 using System.Net;
-using System;
+using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -15,12 +14,9 @@ namespace Quizzify_BLL
         private readonly IMapper mapper;
         private readonly IMemoryCache _cache;
         private readonly Random random = new Random();
+        private readonly QuizzifyDbContext db;
 
-        public UserService(IMemoryCache cache)
-        {
-            _cache = cache;
-        }
-        public UserService()
+        public UserService(QuizzifyDbContext _db, IMemoryCache cache)
         {
             var mapConfig = new MapperConfiguration(cfg => {
                 cfg.CreateMap<User, UserDTO>();
@@ -31,8 +27,10 @@ namespace Quizzify_BLL
                 cfg.CreateMap<UserProfileDTO, UserProfile>();
             });
             mapper = mapConfig.CreateMapper();
+            db = _db;
+            _cache = cache;
+
         }
-        Quizzify_DAL.QuizzifyDbContext db = new QuizzifyDbContext();
 
         public OrganisationDTO GetOrganisationByName(string organisationName)
         {
@@ -44,6 +42,7 @@ namespace Quizzify_BLL
         {
             UserDAL userDAL = new UserDAL(db);
             User user = mapper.Map<User>(userDTO);
+            user.Password = HashPassword(userDTO.Password);
             bool result = userDAL.RegisterNewUser(user);
             return result;
         }
@@ -60,7 +59,6 @@ namespace Quizzify_BLL
             int id = userDAL.AddOrganisationName(organisationName);
             return id;
         }
-       
         public bool DoesUserExist(string email)
         {
             UserDAL userDAL = new UserDAL(db);
@@ -68,7 +66,6 @@ namespace Quizzify_BLL
         }
         public List<string> GetAdminEmailsByOrganisation(string organisationName)
         {
-            
             OrganisationDTO organisation = GetOrganisationByName(organisationName);
             Organisation organisation1 = mapper.Map<Organisation>(organisation);
             UserDAL userDAL = new UserDAL(db);
@@ -99,13 +96,73 @@ namespace Quizzify_BLL
                 throw new InvalidOperationException("Invalid EmailId or Password.");
             }
         }
-       
         public UserProfileDTO GetUserProfile(int userId)
         {
             UserDAL userDAL = new UserDAL(db);
             UserProfile userProfile = userDAL.GetUserProfile(userId);
             UserProfileDTO userProfileDTO = mapper.Map<UserProfileDTO>(userProfile);
             return userProfileDTO;
+        }
+
+        public void SendOTP(string email)
+        {
+            int otp = random.Next(100000, 999999);
+
+            var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(10));
+            _cache.Set(email, otp.ToString(), cacheEntryOptions);
+
+            SendEmail(email, $"Your OTP for password reset: {otp}");
+        }
+
+        public bool VerifyOTP(string email, string otp)
+        {
+            // Retrieve OTP from the cache
+            if (_cache.TryGetValue(email, out string storedOTP))
+            {
+                if (storedOTP == otp)
+                {
+                    // OTP verified successfully, remove it from the cache
+                    _cache.Remove(email);
+                    return true;
+                }
+            }
+            return false;
+        }
+        public void UpdatePassword(string email, string newPassword)
+        {
+            var user = db.Users.FirstOrDefault(u => u.EmailId == email);
+
+            if (user != null)
+            {
+                user.Password = HashPassword(newPassword);
+                db.SaveChanges();
+            }
+            else
+            {
+                throw new Exception("Email not found");
+            }
+        }
+        private void SendEmail(string to, string body)
+        {
+            try
+            {
+                // Configure SMTP client
+                SmtpClient client = new SmtpClient("smtp-mail.outlook.com");
+                client.Port = 587;
+                client.EnableSsl = true;
+                client.UseDefaultCredentials = false;
+                client.Credentials = new NetworkCredential("Gaurav.Tripathi@triconinfotech.com", "Secure@15$%");
+
+                // Create and send email
+                MailMessage mailMessage = new MailMessage("Gaurav.Tripathi@triconinfotech.com", to, "Password Reset OTP", body);
+                mailMessage.IsBodyHtml = true;
+                client.Send(mailMessage);
+            }
+            catch (Exception ex)
+            {
+                // Handle email sending failure
+                Console.WriteLine($"Failed to send email: {ex.Message}");
+            }
         }
         public string HashPassword(string password)
         {

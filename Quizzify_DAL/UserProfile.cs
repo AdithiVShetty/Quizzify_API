@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,5 +16,7 @@ namespace Quizzify_DAL
         public string OrganisationName { get; set; }
         public string? PhoneNumber { get; set; }
         public string? RoleName { get; set; }
+        [DefaultValue(true)]
+        public bool IsActive { get; set; }
     }
 }
