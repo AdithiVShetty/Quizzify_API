@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Quizzify_DAL.ModelClass
+﻿namespace Quizzify_API.Models
 {
-    public class QuizDetails
+    public class QuizDetailsModel
     {
         public int UserId { get; set; }
         public string quizname { get; set; }
@@ -20,6 +14,6 @@ namespace Quizzify_DAL.ModelClass
         public string categories { get; set; }
         public int totalMarks { get; set; }
         public int totalQuestion { get; set; }
-        public List<SelectedQuestion> selectedQuestions { get; set; }
+        public List<SelectedQuestionModel> selectedQuestions { get; set; }
     }
 }

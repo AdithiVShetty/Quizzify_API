@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Quizzify_BLL.DTO
 {
-    public class CategoryDTO
+    public class SelectedQuestionDTO
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public int id { get; set; }
+        public int weightage { get; set; }
     }
 }

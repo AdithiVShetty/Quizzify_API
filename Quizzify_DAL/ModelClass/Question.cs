@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Quizzify_DAL.ModelClass
 {
@@ -7,6 +8,7 @@ namespace Quizzify_DAL.ModelClass
     {
         [Key]
         public int Id { get; set; }
+        public int UserId { get; set; }
 
         [Required]
         public string QuestionText { get; set; }

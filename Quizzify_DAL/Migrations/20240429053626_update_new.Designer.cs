@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Quizzify_DAL;
 
@@ -11,9 +12,11 @@ using Quizzify_DAL;
 namespace Quizzify_DAL.Migrations
 {
     [DbContext(typeof(QuizzifyDbContext))]
-    partial class QuizzifyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240429053626_update_new")]
+    partial class update_new
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,106 +25,7 @@ namespace Quizzify_DAL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Quizzify_DAL.ModelClass.Answer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("ImageId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsCorrect")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("OptionsAnswers")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ImageId");
-
-                    b.HasIndex("QuestionId");
-
-                    b.ToTable("QuizzifyAnswer");
-                });
-
             modelBuilder.Entity("Quizzify_DAL.ModelClass.Category", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("QuizzifyCategory");
-                });
-
-            modelBuilder.Entity("Quizzify_DAL.ModelClass.Feedback", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Comment")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("QuizId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Rating")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuizId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("QuizzifyFeedback");
-                });
-
-            modelBuilder.Entity("Quizzify_DAL.ModelClass.Image", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<byte[]>("Data")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("QuizzifyImage");
-                });
-
-            modelBuilder.Entity("Quizzify_DAL.ModelClass.Organisation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -198,9 +102,7 @@ namespace Quizzify_DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsEnable")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasColumnType("bit");
 
                     b.Property<string>("QuestionText")
                         .IsRequired()
@@ -219,8 +121,6 @@ namespace Quizzify_DAL.Migrations
                     b.HasIndex("ImageId");
 
                     b.HasIndex("QuestionTypeId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("QuizzifyQuestion");
                 });
@@ -255,10 +155,6 @@ namespace Quizzify_DAL.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
-                    b.Property<string>("CategoryName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -282,8 +178,9 @@ namespace Quizzify_DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OrganisationId")
-                        .HasColumnType("int");
+                    b.Property<string>("QuizCategory")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -299,107 +196,12 @@ namespace Quizzify_DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrganisationId");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("QuizzifyQuiz");
                 });
 
             modelBuilder.Entity("Quizzify_DAL.ModelClass.QuizQuestion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Marks")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuizId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("QuestionId");
-
-                    b.HasIndex("QuizId");
-
-                    b.ToTable("QuizzifyQuizQuestions");
-                });
-
-            modelBuilder.Entity("Quizzify_DAL.ModelClass.QuizzifyResponse", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AttemptNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuizId")
-                        .HasColumnType("int");
-
-                    b.Property<TimeSpan>("TimeTaken")
-                        .HasColumnType("time");
-
-                    b.Property<decimal>("TotalScore")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuizId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("QuizzifyResponse");
-                });
-
-            modelBuilder.Entity("Quizzify_DAL.ModelClass.QuizzifyUserResponse", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AttemptedAnswer")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("ObtainedMarks")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ResponseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuestionId");
-
-                    b.HasIndex("ResponseId");
-
-                    b.ToTable("QuizzifyUserResponse");
-                });
-
-            modelBuilder.Entity("Quizzify_DAL.ModelClass.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -499,42 +301,6 @@ namespace Quizzify_DAL.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Quizzify_DAL.ModelClass.Answer", b =>
-                {
-                    b.HasOne("Quizzify_DAL.ModelClass.Image", "Image")
-                        .WithMany()
-                        .HasForeignKey("ImageId");
-
-                    b.HasOne("Quizzify_DAL.ModelClass.Question", "Question")
-                        .WithMany()
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Image");
-
-                    b.Navigation("Question");
-                });
-
-            modelBuilder.Entity("Quizzify_DAL.ModelClass.Feedback", b =>
-                {
-                    b.HasOne("Quizzify_DAL.ModelClass.Quiz", "Quiz")
-                        .WithMany()
-                        .HasForeignKey("QuizId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Quizzify_DAL.ModelClass.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Quiz");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Quizzify_DAL.ModelClass.Question", b =>
                 {
                     b.HasOne("Quizzify_DAL.ModelClass.Category", "Category")
@@ -553,103 +319,41 @@ namespace Quizzify_DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Quizzify_DAL.ModelClass.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Category");
 
                     b.Navigation("Image");
 
                     b.Navigation("QuestionType");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Quizzify_DAL.ModelClass.Quiz", b =>
                 {
-                    b.HasOne("Quizzify_DAL.ModelClass.Organisation", "Organisation")
-                        .WithMany()
-                        .HasForeignKey("OrganisationId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("Quizzify_DAL.ModelClass.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Organisation");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("Quizzify_DAL.ModelClass.QuizQuestion", b =>
                 {
-                    b.HasOne("Quizzify_DAL.ModelClass.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Quizzify_DAL.ModelClass.Question", "Question")
-                        .WithMany()
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Quizzify_DAL.ModelClass.Quiz", "Quiz")
-                        .WithMany()
-                        .HasForeignKey("QuizId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Question");
-
-                    b.Navigation("Quiz");
-                });
-
-            modelBuilder.Entity("Quizzify_DAL.ModelClass.QuizzifyResponse", b =>
-                {
-                    b.HasOne("Quizzify_DAL.ModelClass.Quiz", "Quiz")
-                        .WithMany()
-                        .HasForeignKey("QuizId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Quizzify_DAL.ModelClass.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Quiz");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Quizzify_DAL.ModelClass.QuizzifyUserResponse", b =>
-                {
                     b.HasOne("Quizzify_DAL.ModelClass.Question", "Question")
                         .WithMany()
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Quizzify_DAL.ModelClass.QuizzifyResponse", "Response")
+                    b.HasOne("Quizzify_DAL.ModelClass.Quiz", "Quiz")
                         .WithMany()
-                        .HasForeignKey("ResponseId")
+                        .HasForeignKey("QuizId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Question");
 
-                    b.Navigation("Response");
+                    b.Navigation("Quiz");
                 });
 
             modelBuilder.Entity("Quizzify_DAL.ModelClass.User", b =>

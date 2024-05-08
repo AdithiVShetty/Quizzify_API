@@ -24,6 +24,11 @@ namespace Quizzify_DAL
                 return false;
             }
         }
+        public Organisation GetOrganisationByName(string organisationName)
+        {
+            Organisation organisation = context.Organisations.FirstOrDefault(o => o.Name == organisationName);
+            return organisation;
+        }
         public List<Organisation> GetOrganisation()
         {
             return db.Organisations.ToList();

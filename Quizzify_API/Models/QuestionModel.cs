@@ -5,8 +5,10 @@ using Quizzify_DAL.ModelClass;
 namespace Quizzify_API.Models
 {
     public class QuestionModel
-    { 
+    {
+        [Key]
         public int Id { get; set; }
+        public int UserId { get; set; }
 
         [Required]
         public string QuestionText { get; set; }
@@ -20,6 +22,7 @@ namespace Quizzify_API.Models
         public Category? Category { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
+        public string CreatedBy { get; set; }
 
         [DefaultValue(true)]
         public bool IsEnable { get; set; }

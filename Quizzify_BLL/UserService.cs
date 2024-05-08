@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Caching.Memory;
 using Quizzify_BLL.DTO;
 using Quizzify_DAL;
-using Quizzify_DAL.ModelClass;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
@@ -28,7 +27,6 @@ namespace Quizzify_BLL
                 cfg.CreateMap<UserProfileDTO, UserProfile>();
             });
             mapper = mapConfig.CreateMapper();
-            db = _db;
             _cache = cache;
             this.userDAL = userDAL;
         }
@@ -181,10 +179,10 @@ namespace Quizzify_BLL
                 client.Port = port;
                 client.EnableSsl = enableSsl;
                 client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential(username, password);
+                client.Credentials = new NetworkCredential("yourEmail", "yourPassword");
 
                 // Create and send email
-                MailMessage mailMessage = new MailMessage(senderEmail, to, "Password Reset OTP", body);
+                MailMessage mailMessage = new MailMessage("sender's email", to, "Password Reset OTP", body);
                 mailMessage.IsBodyHtml = true;
                 client.Send(mailMessage);
             }
