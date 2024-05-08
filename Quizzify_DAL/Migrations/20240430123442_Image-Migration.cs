@@ -5,7 +5,7 @@
 namespace Quizzify_DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class IsActiveUpdate : Migration
+    public partial class ImageMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

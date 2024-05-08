@@ -1,11 +1,40 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Quizzify_BLL;
 using Quizzify_DAL;
+using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
+var _configuration = builder.Configuration;
 
 // Add services to the container.
 builder.Services.AddDbContext<QuizzifyDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnection")));
+
+//JWT Authentication
+
+var key = Encoding.ASCII.GetBytes(_configuration["Jwt:SecretKey"]);
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = _configuration["Jwt:Issuer"],
+            ValidAudience = _configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+
+// Add authorization policies
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -34,7 +63,17 @@ builder.Services.AddSession(options =>
 builder.Services.AddMemoryCache();
 // Register UserService with the dependency injection container
 
+// Register DAL services
+builder.Services.AddScoped<UserDAL>();
+builder.Services.AddScoped<QuestionDAL>();
+
+// Register BLL services
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<QuestionService>();
+
+// Add other services and configurations as needed
+
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -48,6 +87,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
 app.MapControllers();

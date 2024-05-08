@@ -1,16 +1,20 @@
-﻿namespace Quizzify_DAL
+﻿using System.Security.Cryptography;
+using System.Text;
+using Quizzify_DAL.ModelClass;
+
+namespace Quizzify_DAL
 {
     public class UserDAL
     {
-        private QuizzifyDbContext context;
+        private QuizzifyDbContext db;
         public UserDAL(QuizzifyDbContext context)
         {
-            this.context = context;
+            this.db = context;
         }
         public bool RegisterNewUser(User user)
         {
-            context.Users.Add(user);
-            int result = context.SaveChanges();
+            db.Users.Add(user);
+            int result = db.SaveChanges();
             if (result != 0)
             {
                 return true;
@@ -22,7 +26,12 @@
         }
         public List<Organisation> GetOrganisation()
         {
-            return context.Organisations.ToList();
+            return db.Organisations.ToList();
+        }
+        public Organisation GetOrganisationByName(string organisationName)
+        {
+            Organisation organisation = db.Organisations.FirstOrDefault(o => o.Name == organisationName);
+            return organisation;
         }
         public int AddOrganisationName(string OrganisationName)
         {
@@ -30,24 +39,31 @@
             {
                 Name = OrganisationName
             };
-            context.Organisations.Add(organisation);
-            context.SaveChanges();
+            db.Organisations.Add(organisation);
+            db.SaveChanges();
             return organisation.Id;
+        }
+        public User Login(string email, string password)
+        {
+            string hashedPassword = HashPassword(password);
+            string normalPassword = password;
+
+            return db.Users.FirstOrDefault(u => u.EmailId == email && (u.Password == hashedPassword || u.Password == normalPassword));
         }
         public bool UpdatePassword(string email, string newPassword)
         {
-            var user = context.Users.FirstOrDefault(u => u.EmailId == email);
+            var user = db.Users.FirstOrDefault(u => u.EmailId == email);
             if (user != null)
             {
                 user.Password = newPassword;
-                context.SaveChanges();
+                db.SaveChanges();
                 return true;
             }
             return false;
         }
         public bool DoesUserExist(string email)
         {
-            var user = context.Users.FirstOrDefault(u => u.EmailId == email);
+            var user = db.Users.FirstOrDefault(u => u.EmailId == email);
             if (user != null)
             {
                 return true;
@@ -59,8 +75,8 @@
         }
         public List<string> GetAdminEmailsByOrganisation(int id)
         {
-            Role role = context.Roles.FirstOrDefault(r => r.Name == "Admin");
-            var adminEmails = (from user in context.Users
+            Role role = db.Roles.FirstOrDefault(r => r.Name == "Admin");
+            var adminEmails = (from user in db.Users
                                where user.OrganisationId == id && user.RoleId == role.Id
                                select user.EmailId).ToList();
 
@@ -68,9 +84,9 @@
         }
         public UserProfile GetUserProfile(int id)
         {
-            var user = context.Users.FirstOrDefault(u => u.Id == id);
-            var organization = context.Organisations.FirstOrDefault(o => o.Id == user.OrganisationId);
-            var role = context.Roles.FirstOrDefault(r => r.Id == user.RoleId);
+            var user = db.Users.FirstOrDefault(u => u.Id == id);
+            var organization = db.Organisations.FirstOrDefault(o => o.Id == user.OrganisationId);
+            var role = db.Roles.FirstOrDefault(r => r.Id == user.RoleId);
             UserProfile userProfile = new UserProfile();
             userProfile.Id = id;
             userProfile.Name = user.Name;
@@ -78,7 +94,74 @@
             userProfile.PhoneNumber = user.PhoneNumber;
             userProfile.OrganisationName = organization.Name;
             userProfile.RoleName = role.Name;
+            userProfile.IsActive = user.IsActive;
             return userProfile;
+        }
+        public bool UpdateUserDetails(int id, UserProfile user)
+        {
+            var existingUser = db.Users.FirstOrDefault(u => u.Id == id);
+            if (existingUser != null)
+            {
+                existingUser.Name = user.Name;
+                existingUser.PhoneNumber = user.PhoneNumber;
+                db.SaveChanges();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public User VerifyPassword(int userId, string password)
+        {
+            string hashedPassword = HashPassword(password);
+            string normalPassword = password;
+
+            return db.Users.FirstOrDefault(u => u.Id == userId && (u.Password == hashedPassword || u.Password == normalPassword));
+        }
+        public bool ChangePassword(int userId, ChangePassword passwordChange)
+        {
+            var user = db.Users.FirstOrDefault(u => u.Id == userId);
+            if (user != null)
+            {
+                user.Password = HashPassword(passwordChange.NewPassword);
+                db.SaveChanges();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public void ToggleAccountStatus(int userId)
+        {
+            var user = db.Users.FirstOrDefault(u => u.Id == userId);
+            if (user != null)
+            {
+                user.IsActive = !user.IsActive;
+                db.SaveChanges();
+            }
+        }
+        public User GetUserById(int userId)
+        {
+            return db.Users.FirstOrDefault(c => c.Id == userId);
+        }
+        public string HashPassword(string password)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+
+                byte[] truncatedBytes = new byte[8];
+                Array.Copy(bytes, truncatedBytes, 8);
+
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < truncatedBytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                return builder.ToString();
+            }
         }
     }
 }

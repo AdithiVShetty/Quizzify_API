@@ -1,4 +1,4 @@
-﻿namespace Quizzify_BLL
+﻿namespace Quizzify_BLL.DTO
 {
     public class UserDTO
     {
