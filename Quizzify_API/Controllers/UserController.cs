@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Quizzify_API.Models;
 using Quizzify_BLL;
+using Quizzify_BLL.DTO;
 using System.Net;
 using System.Net.Mail;
 

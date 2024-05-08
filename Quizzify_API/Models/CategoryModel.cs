@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Quizzify_DAL
+namespace Quizzify_API.Models
 {
-    public class Organisation
+    public class CategoryModel
     {
         [Key]
         public int Id { get; set; }

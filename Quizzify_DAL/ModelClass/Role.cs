@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Quizzify_DAL
+namespace Quizzify_DAL.ModelClass
 {
     public class Role
     {

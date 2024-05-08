@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Quizzify_BLL.DTO;
 using Quizzify_DAL;
+using Quizzify_DAL.DAL;
+using Quizzify_DAL.ModelClass;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
@@ -15,8 +18,8 @@ namespace Quizzify_BLL
         private readonly IMemoryCache _cache;
         private readonly Random random = new Random();
         private readonly QuizzifyDbContext db;
-
-        public UserService(QuizzifyDbContext _db, IMemoryCache cache)
+        private readonly UserDAL userDAL;
+        public UserService(UserDAL userDAL, QuizzifyDbContext db, IMemoryCache cache)
         {
             var mapConfig = new MapperConfiguration(cfg => {
                 cfg.CreateMap<User, UserDTO>();
@@ -27,20 +30,19 @@ namespace Quizzify_BLL
                 cfg.CreateMap<UserProfileDTO, UserProfile>();
             });
             mapper = mapConfig.CreateMapper();
-            db = _db;
             _cache = cache;
-
+            this.db = db;
+            this.userDAL=userDAL;
         }
 
         public OrganisationDTO GetOrganisationByName(string organisationName)
         {
-            Organisation organisation = db.Organisations.FirstOrDefault(o => o.Name == organisationName);
-            OrganisationDTO organisation1 = mapper.Map<OrganisationDTO>(organisation);
-            return organisation1;
+            Organisation organisation = userDAL.GetOrganisationByName(organisationName);
+            OrganisationDTO organisationDTO = mapper.Map<OrganisationDTO>(organisation);
+            return organisationDTO;
         }
         public bool RegisterNewUser(UserDTO userDTO)
         {
-            UserDAL userDAL = new UserDAL(db);
             User user = mapper.Map<User>(userDTO);
             user.Password = HashPassword(userDTO.Password);
             bool result = userDAL.RegisterNewUser(user);
@@ -48,27 +50,23 @@ namespace Quizzify_BLL
         }
         public List<OrganisationDTO> GetOrganisations()
         {
-            UserDAL userDAL = new UserDAL(db);
             List<Organisation> organisations = userDAL.GetOrganisation();
             List<OrganisationDTO> organisationDTOs = mapper.Map<List<OrganisationDTO>>(organisations);
             return organisationDTOs;
         }
         public int AddOrganisationName(string organisationName)
         {
-            UserDAL userDAL = new UserDAL(db);
             int id = userDAL.AddOrganisationName(organisationName);
             return id;
         }
         public bool DoesUserExist(string email)
         {
-            UserDAL userDAL = new UserDAL(db);
             return userDAL.DoesUserExist(email);
         }
         public List<string> GetAdminEmailsByOrganisation(string organisationName)
         {
             OrganisationDTO organisation = GetOrganisationByName(organisationName);
             Organisation organisation1 = mapper.Map<Organisation>(organisation);
-            UserDAL userDAL = new UserDAL(db);
             return userDAL.GetAdminEmailsByOrganisation(organisation1.Id);
         }
         public UserDTO Login(string email, string password)
@@ -98,7 +96,6 @@ namespace Quizzify_BLL
         }
         public UserProfileDTO GetUserProfile(int userId)
         {
-            UserDAL userDAL = new UserDAL(db);
             UserProfile userProfile = userDAL.GetUserProfile(userId);
             UserProfileDTO userProfileDTO = mapper.Map<UserProfileDTO>(userProfile);
             return userProfileDTO;

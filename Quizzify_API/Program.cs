@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Quizzify_BLL;
 using Quizzify_DAL;
+using Quizzify_DAL.DAL;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,9 @@ builder.Services.AddMemoryCache();
 // Register UserService with the dependency injection container
 
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<UserDAL>();
+builder.Services.AddScoped<CreateQuizService>();
+builder.Services.AddScoped<CreateQuizDAL>();
 
 var app = builder.Build();
 

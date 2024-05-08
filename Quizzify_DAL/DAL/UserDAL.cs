@@ -1,7 +1,12 @@
-﻿namespace Quizzify_DAL
+﻿using AutoMapper;
+using Quizzify_DAL.ModelClass;
+
+namespace Quizzify_DAL.DAL
 {
     public class UserDAL
     {
+        private readonly IMapper mapper;
+
         private QuizzifyDbContext context;
         public UserDAL(QuizzifyDbContext context)
         {
@@ -19,6 +24,11 @@
             {
                 return false;
             }
+        }
+        public Organisation GetOrganisationByName(string organisationName)
+        {
+            Organisation organisation = context.Organisations.FirstOrDefault(o => o.Name == organisationName);
+            return organisation;
         }
         public List<Organisation> GetOrganisation()
         {

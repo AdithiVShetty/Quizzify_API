@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 
-namespace Quizzify_DAL
+namespace Quizzify_DAL.ModelClass
 {
     public class User
     {
@@ -27,7 +27,7 @@ namespace Quizzify_DAL
         public Organisation Organisation { get; set; }
         [DefaultValue(3)]
         public int RoleId { get; set; }
-        
+
         public Role Role { get; set; }
     }
 }

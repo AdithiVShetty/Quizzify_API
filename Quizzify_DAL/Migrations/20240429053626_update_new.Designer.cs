@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Quizzify_DAL;
 
@@ -11,9 +12,11 @@ using Quizzify_DAL;
 namespace Quizzify_DAL.Migrations
 {
     [DbContext(typeof(QuizzifyDbContext))]
-    partial class QuizzifyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240429053626_update_new")]
+    partial class update_new
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -1,6 +1,6 @@
-﻿namespace Quizzify_BLL
+﻿namespace Quizzify_BLL.DTO
 {
-    public class OrganisationDTO
+    public class RoleDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }

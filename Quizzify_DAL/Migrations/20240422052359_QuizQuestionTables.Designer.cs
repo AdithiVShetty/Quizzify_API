@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Quizzify_DAL;
 
@@ -11,9 +12,11 @@ using Quizzify_DAL;
 namespace Quizzify_DAL.Migrations
 {
     [DbContext(typeof(QuizzifyDbContext))]
-    partial class QuizzifyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240422052359_QuizQuestionTables")]
+    partial class QuizQuestionTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,7 +39,7 @@ namespace Quizzify_DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("QuizzifyCategory");
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("Quizzify_DAL.ModelClass.Image", b =>
@@ -57,7 +60,7 @@ namespace Quizzify_DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("QuizzifyImage");
+                    b.ToTable("Image");
                 });
 
             modelBuilder.Entity("Quizzify_DAL.ModelClass.Organisation", b =>
@@ -108,9 +111,6 @@ namespace Quizzify_DAL.Migrations
                     b.Property<int>("QuestionTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
@@ -119,7 +119,7 @@ namespace Quizzify_DAL.Migrations
 
                     b.HasIndex("QuestionTypeId");
 
-                    b.ToTable("QuizzifyQuestion");
+                    b.ToTable("Question");
                 });
 
             modelBuilder.Entity("Quizzify_DAL.ModelClass.QuestionType", b =>
@@ -136,7 +136,7 @@ namespace Quizzify_DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("QuizzifyQuestionType");
+                    b.ToTable("QuestionType");
                 });
 
             modelBuilder.Entity("Quizzify_DAL.ModelClass.Quiz", b =>
@@ -151,10 +151,6 @@ namespace Quizzify_DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
@@ -172,10 +168,6 @@ namespace Quizzify_DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("QuizCategory")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -206,6 +198,9 @@ namespace Quizzify_DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("Marks")
                         .HasColumnType("decimal(18,2)");
 
@@ -216,6 +211,8 @@ namespace Quizzify_DAL.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("QuestionId");
 
@@ -336,6 +333,12 @@ namespace Quizzify_DAL.Migrations
 
             modelBuilder.Entity("Quizzify_DAL.ModelClass.QuizQuestion", b =>
                 {
+                    b.HasOne("Quizzify_DAL.ModelClass.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Quizzify_DAL.ModelClass.Question", "Question")
                         .WithMany()
                         .HasForeignKey("QuestionId")
@@ -347,6 +350,8 @@ namespace Quizzify_DAL.Migrations
                         .HasForeignKey("QuizId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Category");
 
                     b.Navigation("Question");
 

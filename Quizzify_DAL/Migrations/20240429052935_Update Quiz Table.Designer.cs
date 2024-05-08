@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Quizzify_DAL;
 
@@ -11,9 +12,11 @@ using Quizzify_DAL;
 namespace Quizzify_DAL.Migrations
 {
     [DbContext(typeof(QuizzifyDbContext))]
-    partial class QuizzifyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240429052935_Update Quiz Table")]
+    partial class UpdateQuizTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -152,10 +155,6 @@ namespace Quizzify_DAL.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
 
@@ -172,10 +171,6 @@ namespace Quizzify_DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("QuizCategory")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -206,6 +201,9 @@ namespace Quizzify_DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("Marks")
                         .HasColumnType("decimal(18,2)");
 
@@ -216,6 +214,8 @@ namespace Quizzify_DAL.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("QuestionId");
 
@@ -336,6 +336,12 @@ namespace Quizzify_DAL.Migrations
 
             modelBuilder.Entity("Quizzify_DAL.ModelClass.QuizQuestion", b =>
                 {
+                    b.HasOne("Quizzify_DAL.ModelClass.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Quizzify_DAL.ModelClass.Question", "Question")
                         .WithMany()
                         .HasForeignKey("QuestionId")
@@ -347,6 +353,8 @@ namespace Quizzify_DAL.Migrations
                         .HasForeignKey("QuizId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Category");
 
                     b.Navigation("Question");
 
