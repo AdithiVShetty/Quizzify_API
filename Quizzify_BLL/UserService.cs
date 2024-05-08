@@ -148,10 +148,10 @@ namespace Quizzify_BLL
                 client.Port = 587;
                 client.EnableSsl = true;
                 client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential("Gaurav.Tripathi@triconinfotech.com", "Secure@15$%");
+                client.Credentials = new NetworkCredential("yourEmail", "yourPassword");
 
                 // Create and send email
-                MailMessage mailMessage = new MailMessage("Gaurav.Tripathi@triconinfotech.com", to, "Password Reset OTP", body);
+                MailMessage mailMessage = new MailMessage("sender's email", to, "Password Reset OTP", body);
                 mailMessage.IsBodyHtml = true;
                 client.Send(mailMessage);
             }
