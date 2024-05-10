@@ -35,6 +35,7 @@ builder.Services.AddMemoryCache();
 // Register UserService with the dependency injection container
 
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<UserUpdateService>();
 
 var app = builder.Build();
 

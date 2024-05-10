@@ -7,6 +7,7 @@ namespace Quizzify_DAL
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Organisation> Organisations { get; set; }
+        public DbSet<Feedback> Feedbacks { get; set; }
         public QuizzifyDbContext(DbContextOptions<QuizzifyDbContext> options) : base(options)
         {
 
@@ -42,6 +43,15 @@ namespace Quizzify_DAL
             modelBuilder.Entity<User>()
                 .Property(u => u.RoleId)
                 .HasDefaultValue(3);
+            modelBuilder.Entity<Feedback>()
+                .HasOne(u=>u.Quiz)
+                .WithMany()
+                .HasForeignKey(u=>u.QuizId);
+            modelBuilder.Entity<Feedback>()
+                .HasOne(u=> u.User)
+                .WithMany()
+                .HasForeignKey(u=>u.UserId);
+
         }
     }
 }
