@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Quizzify_DAL.Migrations
+namespace Quizzify_BLL.Migrations
 {
     /// <inheritdoc />
     public partial class Update1 : Migration

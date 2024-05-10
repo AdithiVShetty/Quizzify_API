@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 
-namespace Quizzify_DAL.ModelClass
+namespace Quizzify_BLL.DTO
 {
     public class User
     {

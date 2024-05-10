@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Quizzify_DAL.ModelClass;
-using Image = Quizzify_DAL.ModelClass.Image;
+using Quizzify_BLL.DTO;
+using Image = Quizzify_BLL.DTO.Image;
 
-namespace Quizzify_DAL
+namespace Quizzify_BLL
 {
     public class QuestionDAL
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Quizzify_DAL.ModelClass;
+using Quizzify_BLL.DTO;
 
-namespace Quizzify_DAL
+namespace Quizzify_BLL
 {
     public class QuizzifyDbContext : DbContext
     {
@@ -110,8 +110,7 @@ namespace Quizzify_DAL
                 entity.Property(q => q.IsEnable).HasDefaultValue(true);
                 entity.Property(q => q.AutoValidation).HasDefaultValue(true);
                 entity.HasOne(q => q.User).WithMany().HasForeignKey(q => q.UserId);
-                entity.HasOne(q => q.Organisation).WithMany().HasForeignKey(q => q.OrganisationId)
-                .OnDelete(DeleteBehavior.NoAction);
+                
                 entity.Property(q => q.TotalMarks)
                       .HasColumnType("decimal(18,2)")
                       .IsRequired();

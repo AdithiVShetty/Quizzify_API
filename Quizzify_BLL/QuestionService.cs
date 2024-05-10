@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
+using Quizzify_API.Models;
+using Quizzify_BLL;
 using Quizzify_BLL.DTO;
-using Quizzify_DAL;
-using Quizzify_DAL.ModelClass;
 
-namespace Quizzify_BLL
+namespace Quizzify_API
 {
     public class QuestionService
     {

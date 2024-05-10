@@ -1,13 +1,11 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Quizzify_API.Models;
-using Quizzify_BLL;
-using Quizzify_BLL.DTO;
-using static StackExchange.Redis.Role;
 
 namespace Quizzify_API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CreateQuizController : ControllerBase
@@ -18,10 +16,10 @@ namespace Quizzify_API.Controllers
         {
             var mapConfig = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<CategoryDTO, CategoryModel>();
-                cfg.CreateMap<CategoryModel, CategoryDTO>();
                 cfg.CreateMap<QuestionModel, QuestionDTO>();
                 cfg.CreateMap<QuestionDTO, QuestionModel>();
+                cfg.CreateMap<QuizQuestionsDisplayModel, QuizQuestionsDisplayDTO>();
+                cfg.CreateMap<QuizQuestionsDisplayDTO, QuizQuestionsDisplayModel>();
                 cfg.CreateMap<QuizDetailsModel, QuizDetailsDTO>();
                 cfg.CreateMap<QuizDetailsDTO,QuizDetailsModel>();
                 cfg.CreateMap<SelectedQuestionModel,SelectedQuestionDTO>();
@@ -30,18 +28,12 @@ namespace Quizzify_API.Controllers
             mapper = mapConfig.CreateMapper();
             _createQuizService = createQuizService;
         }
-        [HttpGet("GetCategory")]
-        public List<CategoryModel> GetCategories()
-        {
-            List<CategoryDTO> categoryDTOs = _createQuizService.GetCategories();
-            List<CategoryModel> categoryModels = mapper.Map<List<CategoryModel>>(categoryDTOs);
-            return categoryModels;
-        }
+
         [HttpGet("CategoryQuestions")]
-        public List<QuestionModel> GetCategoryQuestions(int categoryId, string organisationName)
+        public List<QuizQuestionsDisplayModel> GetCategoryQuestions(int categoryId, string organisationName)
         {
-            List<QuestionDTO> questionDTOs = _createQuizService.GetCategoryQuestions(categoryId, organisationName);
-            List<QuestionModel> questionsModels = mapper.Map<List<QuestionModel>>(questionDTOs);
+            List<QuizQuestionsDisplayDTO> questionDTOs = _createQuizService.GetCategoryQuestions(categoryId, organisationName);
+            List<QuizQuestionsDisplayModel> questionsModels = mapper.Map<List<QuizQuestionsDisplayModel>>(questionDTOs);
             return questionsModels;
         }
         [HttpPost("CreateQuiz")]
@@ -57,6 +49,13 @@ namespace Quizzify_API.Controllers
             {
                 return BadRequest("Something went wrong try again ");
             }
+        }
+        [HttpGet("CategoryQuestionsByCreator/{creatorName}")]
+        public List<QuestionModel> GetCategoryQuestionsByCreator(int categoryId, string organisationName, string creatorName)
+        {
+            List<QuestionDTO> questionDTOs = _createQuizService.GetCategoryQuestionsByCreator(categoryId, organisationName, creatorName);
+            List<QuestionModel> questionsModels = mapper.Map<List<QuestionModel>>(questionDTOs);
+            return questionsModels;
         }
     }
 }

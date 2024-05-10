@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Quizzify_BLL.DTO
+namespace Quizzify_API.Models
 {
     public class QuestionDisplayDTO
     {

@@ -1,8 +1,8 @@
-﻿using Quizzify_DAL.ModelClass;
+﻿using Quizzify_BLL.DTO;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 
-namespace Quizzify_BLL.DTO
+namespace Quizzify_API.Models
 {
     public class QuestionAddDTO
     {

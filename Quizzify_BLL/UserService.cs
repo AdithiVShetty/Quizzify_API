@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Caching.Memory;
+using Quizzify_API.Models;
+using Quizzify_BLL;
 using Quizzify_BLL.DTO;
-using Quizzify_DAL;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Quizzify_BLL
+namespace Quizzify_API
 {
     public class UserService
     {
@@ -76,6 +77,7 @@ namespace Quizzify_BLL
                     EmailId = loginUser.EmailId,
                     Name = loginUser.Name,
                     RoleId = loginUser.RoleId,
+                    OrganisationId = loginUser.OrganisationId,
                     IsApproved = loginUser.IsApproved,
                 };
                 return userDTO;

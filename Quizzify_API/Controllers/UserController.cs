@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Quizzify_API.Models;
-using Quizzify_BLL;
-using Quizzify_BLL.DTO;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Mail;
@@ -72,7 +70,7 @@ namespace Quizzify_API.Controllers
                 }
                 var token = GenerateJwtToken(loggedInUser);
 
-                return Ok(new { token, userType = GetRoleName(loggedInUser.RoleId), userId = loggedInUser.Id, userName = loggedInUser.Name, isApproved = loggedInUser.IsApproved });
+                return Ok(new { token, userType = GetRoleName(loggedInUser.RoleId), userId = loggedInUser.Id, userName = loggedInUser.Name, isApproved = loggedInUser.IsApproved, organisationId = loggedInUser.OrganisationId });
             }
             catch (InvalidOperationException ex)
             {

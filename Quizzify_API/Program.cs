@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Quizzify_API;
 using Quizzify_BLL;
-using Quizzify_DAL;
+using Quizzify_BLL;
 using System.Text;
 
 
@@ -66,10 +67,15 @@ builder.Services.AddMemoryCache();
 // Register DAL services
 builder.Services.AddScoped<UserDAL>();
 builder.Services.AddScoped<QuestionDAL>();
+builder.Services.AddScoped<QuizDAL>();
+builder.Services.AddScoped<AttemptQuizDAL>();
+
 
 // Register BLL services
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<QuestionService>();
+builder.Services.AddScoped<CreateQuizService>();
+builder.Services.AddScoped<AttemptQuizService>();
 
 // Add other services and configurations as needed
 

@@ -1,28 +1,56 @@
-﻿using Quizzify_DAL.ModelClass;
+﻿using Quizzify_BLL.DTO;
 
-namespace Quizzify_DAL
+namespace Quizzify_BLL
 {
-    public class CreateQuizDAL
+    public class QuizDAL
     {
         private QuizzifyDbContext context;
-        public CreateQuizDAL(QuizzifyDbContext context)
+        public QuizDAL(QuizzifyDbContext context)
         {
             this.context = context;
         }
-        public List<Category> GetCategories()
-        {
-            return context.QuizzifyCategory.ToList();
-        }
-        //return context.Organisations.FirstOrDefault(o => o.Name == organisationName);
-        public List<Question> GetCategoryQuestions(int categoryId, string organisation)
+
+        public List<QuizQuestionsDisplay> GetCategoryQuestions(int categoryId, string organisation)
         {
             Organisation org = context.Organisations.FirstOrDefault(o => o.Name == organisation);
-            //return context.QuizzifyQuestions
-            //          .Where(qq => qq.CategoryId == categoryId)
-            //          .ToList();
+
+            var query = from question in context.QuizzifyQuestion
+                        join user in context.Users on question.UserId equals user.Id
+                        join image in context.QuizzifyImage on question.ImageId equals image.Id into imageGroup
+                        from img in imageGroup.DefaultIfEmpty()
+                        join category in context.QuizzifyCategory on question.CategoryId equals category.Id
+                        where (user.OrganisationId == org.Id && question.CategoryId == categoryId && question.IsEnable)
+                        select new QuizQuestionsDisplay
+                        {
+                            Id = question.Id,
+                            UserId = question.UserId,
+                            QuestionText = question.QuestionText,
+                            CategoryName = category.Name,
+                            IsEnable = question.IsEnable,
+                            CreatedBy = question.CreatedBy,
+                            Answers = context.QuizzifyAnswer
+                                    .Where(a => a.QuestionId == question.Id)
+                                    .Select(a => a.OptionsAnswers)
+                                    .ToList(),
+                            //CorrectAnswer = GetCorrectAnswer(question.Id),
+                            IsCorrect = context.QuizzifyAnswer.Any(a => a.QuestionId == question.Id && a.IsCorrect),
+                            ImageData = img != null ? img.Data : null,
+                        };
+
+            var result = query.ToList();
+            return result;
+        }
+        private string GetCorrectAnswer(int questionId)
+        {
+            return context.QuizzifyAnswer.FirstOrDefault(a => a.QuestionId == questionId && a.IsCorrect)?.OptionsAnswers;
+        }
+        public List<Question> GetCategoryQuestionsByCreator(int categoryId, string organisation, string creatorName)
+        {
+            Organisation org = context.Organisations.FirstOrDefault(o => o.Name == organisation);
+
             var query = from qq in context.QuizzifyQuestion
                         join u in context.Users on qq.UserId equals u.Id
-                        where (u.OrganisationId == org.Id && qq.CategoryId == categoryId && qq.IsEnable)
+                        where (u.OrganisationId == org.Id && qq.CreatedBy == creatorName &&qq.CategoryId == categoryId && qq.IsEnable)
                         select qq;
 
             var result = query.ToList();

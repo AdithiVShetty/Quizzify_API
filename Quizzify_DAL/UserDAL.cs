@@ -1,8 +1,8 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using Quizzify_DAL.ModelClass;
+using Quizzify_BLL.DTO;
 
-namespace Quizzify_DAL
+namespace Quizzify_BLL
 {
     public class UserDAL
     {
@@ -26,17 +26,12 @@ namespace Quizzify_DAL
         }
         public Organisation GetOrganisationByName(string organisationName)
         {
-            Organisation organisation = context.Organisations.FirstOrDefault(o => o.Name == organisationName);
+            Organisation organisation = db.Organisations.FirstOrDefault(o => o.Name == organisationName);
             return organisation;
         }
         public List<Organisation> GetOrganisation()
         {
             return db.Organisations.ToList();
-        }
-        public Organisation GetOrganisationByName(string organisationName)
-        {
-            Organisation organisation = db.Organisations.FirstOrDefault(o => o.Name == organisationName);
-            return organisation;
         }
         public int AddOrganisationName(string OrganisationName)
         {

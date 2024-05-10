@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Quizzify_DAL;
+using Quizzify_BLL;
 
 #nullable disable
 
-namespace Quizzify_DAL.Migrations
+namespace Quizzify_BLL.Migrations
 {
     [DbContext(typeof(QuizzifyDbContext))]
     partial class QuizzifyDbContextModelSnapshot : ModelSnapshot

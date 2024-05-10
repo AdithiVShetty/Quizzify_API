@@ -1,4 +1,4 @@
-﻿namespace Quizzify_BLL.DTO
+﻿namespace Quizzify_API.Models
 {
     public class OrganisationDTO
     {

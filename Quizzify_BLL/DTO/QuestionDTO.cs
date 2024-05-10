@@ -1,8 +1,8 @@
-﻿using Quizzify_DAL.ModelClass;
+﻿using Quizzify_BLL.DTO;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Quizzify_BLL.DTO
+namespace Quizzify_API.Models
 {
     public class QuestionDTO
     {
@@ -11,7 +11,6 @@ namespace Quizzify_BLL.DTO
             IsEnable = true;
         }
         public int Id { get; set; }
-        public int UserId { get; set; }
 
         [Required]
         public string QuestionText { get; set; }
@@ -25,7 +24,6 @@ namespace Quizzify_BLL.DTO
         public Category? Category { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
-        public string CreatedBy { get; set; }
 
         [DefaultValue(true)]
         public bool IsEnable { get; set; }

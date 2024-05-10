@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Quizzify_API.Models;
-using Quizzify_BLL;
-using Quizzify_BLL.DTO;
+using Quizzify_API;
+using Quizzify_API.Models;
 
 namespace Quizzify_API.Controllers
 {

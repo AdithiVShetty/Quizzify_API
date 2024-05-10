@@ -1,4 +1,4 @@
-﻿namespace Quizzify_BLL
+﻿namespace Quizzify_API
 {
     public static class Config
     {

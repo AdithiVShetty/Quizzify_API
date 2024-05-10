@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Quizzify_DAL.Migrations
+namespace Quizzify_BLL.Migrations
 {
     /// <inheritdoc />
     public partial class ResponseUpdate : Migration

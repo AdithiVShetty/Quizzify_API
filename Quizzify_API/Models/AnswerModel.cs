@@ -1,4 +1,4 @@
-﻿using Quizzify_DAL.ModelClass;
+﻿using Quizzify_BLL.DTO;
 using System.ComponentModel;
 
 namespace Quizzify_API.Models
