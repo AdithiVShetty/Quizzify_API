@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Quizzify_BLL.DTO;
+
 
 namespace Quizzify_DAL
 {

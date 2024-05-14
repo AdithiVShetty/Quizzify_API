@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Quizzify_DAL;
+using Quizzify_API.Models;
+using Quizzify_BLL;
+using Quizzify_BLL.DTO;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Quizzify_BLL
+namespace Quizzify_API
 {
     public class UserService
     {
@@ -15,8 +16,8 @@ namespace Quizzify_BLL
         private readonly IMemoryCache _cache;
         private readonly Random random = new Random();
         private readonly QuizzifyDbContext db;
-
-        public UserService(QuizzifyDbContext _db, IMemoryCache cache)
+        private readonly UserDAL userDAL;
+        public UserService(QuizzifyDbContext _db, IMemoryCache cache, UserDAL userDAL)
         {
             var mapConfig = new MapperConfiguration(cfg => {
                 cfg.CreateMap<User, UserDTO>();
@@ -27,20 +28,17 @@ namespace Quizzify_BLL
                 cfg.CreateMap<UserProfileDTO, UserProfile>();
             });
             mapper = mapConfig.CreateMapper();
-            db = _db;
             _cache = cache;
-
+            this.userDAL = userDAL;
         }
-
         public OrganisationDTO GetOrganisationByName(string organisationName)
         {
-            Organisation organisation = db.Organisations.FirstOrDefault(o => o.Name == organisationName);
-            OrganisationDTO organisation1 = mapper.Map<OrganisationDTO>(organisation);
-            return organisation1;
+            Organisation organisation = userDAL.GetOrganisationByName(organisationName);
+            OrganisationDTO organisationDTO = mapper.Map<OrganisationDTO>(organisation);
+            return organisationDTO;
         }
         public bool RegisterNewUser(UserDTO userDTO)
         {
-            UserDAL userDAL = new UserDAL(db);
             User user = mapper.Map<User>(userDTO);
             user.Password = HashPassword(userDTO.Password);
             bool result = userDAL.RegisterNewUser(user);
@@ -48,35 +46,28 @@ namespace Quizzify_BLL
         }
         public List<OrganisationDTO> GetOrganisations()
         {
-            UserDAL userDAL = new UserDAL(db);
             List<Organisation> organisations = userDAL.GetOrganisation();
             List<OrganisationDTO> organisationDTOs = mapper.Map<List<OrganisationDTO>>(organisations);
             return organisationDTOs;
         }
         public int AddOrganisationName(string organisationName)
         {
-            UserDAL userDAL = new UserDAL(db);
             int id = userDAL.AddOrganisationName(organisationName);
             return id;
         }
         public bool DoesUserExist(string email)
         {
-            UserDAL userDAL = new UserDAL(db);
             return userDAL.DoesUserExist(email);
         }
         public List<string> GetAdminEmailsByOrganisation(string organisationName)
         {
             OrganisationDTO organisation = GetOrganisationByName(organisationName);
             Organisation organisation1 = mapper.Map<Organisation>(organisation);
-            UserDAL userDAL = new UserDAL(db);
             return userDAL.GetAdminEmailsByOrganisation(organisation1.Id);
         }
         public UserDTO Login(string email, string password)
         {
-            DbSet<User> userDb = db.Users;
-            string hashedPassword = HashPassword(password);
-            string normalPassword = password;
-            User loginUser = userDb.FirstOrDefault(u => u.EmailId == email && (u.Password == hashedPassword || u.Password == normalPassword));
+            User loginUser = userDAL.Login(email, password);
 
             if (loginUser != null)
             {
@@ -86,9 +77,9 @@ namespace Quizzify_BLL
                     EmailId = loginUser.EmailId,
                     Name = loginUser.Name,
                     RoleId = loginUser.RoleId,
+                    OrganisationId = loginUser.OrganisationId,
                     IsApproved = loginUser.IsApproved,
                 };
-
                 return userDTO;
             }
             else
@@ -98,12 +89,46 @@ namespace Quizzify_BLL
         }
         public UserProfileDTO GetUserProfile(int userId)
         {
-            UserDAL userDAL = new UserDAL(db);
+           
             UserProfile userProfile = userDAL.GetUserProfile(userId);
             UserProfileDTO userProfileDTO = mapper.Map<UserProfileDTO>(userProfile);
             return userProfileDTO;
         }
+        public void UpdateUserProfile(int id, UserProfileDTO userProfileDTO)
+        {
+            UserProfile userProfile = new UserProfile();
+            userProfile.Name = userProfileDTO.Name;
+            userProfile.PhoneNumber = userProfileDTO.PhoneNumber;
+            userDAL.UpdateUserDetails(id, userProfile);
+        }
+        public void ToggleAccount(int userId)
+        {
+            userDAL.ToggleAccountStatus(userId);
+        }
+        public ChangePasswordDTO VerifyPassword(int userId, string password)
+        {
+            User user = userDAL.VerifyPassword(userId, password);
 
+            if (user != null)
+            {
+               ChangePasswordDTO userDTO = new ChangePasswordDTO
+                {
+                    Id = user.Id,
+                    Password = user.Password
+                };
+                return userDTO;
+            }
+            else
+            {
+                throw new InvalidOperationException("Incorrect Password.");
+            }
+        }
+        public void ChangePassword(int id, ChangePasswordDTO changePasswordDTO)
+        {
+            ChangePassword chnagePassword = new ChangePassword();
+            chnagePassword.NewPassword = changePasswordDTO.NewPassword;
+            userDAL.ChangePassword(id, chnagePassword);
+        }
         public void SendOTP(string email)
         {
             int otp = random.Next(100000, 999999);
@@ -111,12 +136,10 @@ namespace Quizzify_BLL
             var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(10));
             _cache.Set(email, otp.ToString(), cacheEntryOptions);
 
-            SendEmail(email, $"Your OTP for password reset: {otp}");
+            SendEmail(email, $"Your OTP for password reset: {otp}\n Your OTP is valid for 10 minutes. If it expires, you can request a resend");
         }
-
         public bool VerifyOTP(string email, string otp)
         {
-            // Retrieve OTP from the cache
             if (_cache.TryGetValue(email, out string storedOTP))
             {
                 if (storedOTP == otp)
@@ -146,15 +169,22 @@ namespace Quizzify_BLL
         {
             try
             {
+                string smtpServer = Config.SmtpServer;
+                int port = Config.Port;
+                bool enableSsl = Config.EnableSsl;
+                string username = Config.Username;
+                string password = Config.Password;
+                string senderEmail = Config.SenderEmail;
+
                 // Configure SMTP client
-                SmtpClient client = new SmtpClient("smtp-mail.outlook.com");
-                client.Port = 587;
-                client.EnableSsl = true;
+                SmtpClient client = new SmtpClient(smtpServer);
+                client.Port = port;
+                client.EnableSsl = enableSsl;
                 client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential("Gaurav.Tripathi@triconinfotech.com", "Secure@15$%");
+                client.Credentials = new NetworkCredential("yourEmail", "yourPassword");
 
                 // Create and send email
-                MailMessage mailMessage = new MailMessage("Gaurav.Tripathi@triconinfotech.com", to, "Password Reset OTP", body);
+                MailMessage mailMessage = new MailMessage("sender's email", to, "Password Reset OTP", body);
                 mailMessage.IsBodyHtml = true;
                 client.Send(mailMessage);
             }

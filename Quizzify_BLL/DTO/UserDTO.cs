@@ -1,4 +1,4 @@
-﻿namespace Quizzify_BLL.DTO
+﻿namespace Quizzify_API.Models
 {
     public class UserDTO
     {
@@ -21,3 +21,4 @@
         public RoleDTO Role { get; set; }
     }
 }
+

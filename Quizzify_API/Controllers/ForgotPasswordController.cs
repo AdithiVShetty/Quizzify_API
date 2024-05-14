@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Quizzify_API.Requests;
-using Quizzify_BLL;
+using Quizzify_API;
 
 namespace Quizzify_API.Controllers
 {

@@ -1,17 +1,20 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Caching.Memory;
+using Quizzify_API.Models;
+using Quizzify_BLL;
 using Quizzify_BLL.DTO;
 using Quizzify_DAL;
 
-namespace Quizzify_BLL
+namespace Quizzify_API
 {
     public class UserUpdateService
     {
 
         private readonly IMapper mapper;
-      
+        private readonly UserUpdateDAL userupdateDAL;
+
         private readonly QuizzifyDbContext db;
-        public UserUpdateService(QuizzifyDbContext _db, IMemoryCache cache)
+        public UserUpdateService(QuizzifyDbContext _db, IMemoryCache cache, UserUpdateDAL userupdateDAL)
         {
             var mapConfig = new MapperConfiguration(cfg => {
                 cfg.CreateMap<UpdateApproval, UpdateApprovalDTO>();
@@ -20,10 +23,12 @@ namespace Quizzify_BLL
                 cfg.CreateMap<RoleDTO, Role>();
                 cfg.CreateMap<Feedback, FeedbackDTO>();
                 cfg.CreateMap<FeedbackDTO, Feedback>();
-
+               
             });
             mapper = mapConfig.CreateMapper();
             db = _db;
+            this.userupdateDAL = userupdateDAL;
+
         }
         public List<RoleDTO> GetRoles()
         {
@@ -37,14 +42,25 @@ namespace Quizzify_BLL
             UserUpdateDAL userupdateDAL = new UserUpdateDAL(db);
             return userupdateDAL.UpdateUserApprovalStatus(userId, isApproved);
         }
+        //public void UpdateUserApprovalStatus(int userId)
+        //{
+        //    userupdateDAL.UpdateUserApprovalStatus(userId);
+        //}
 
 
 
-        public bool UpdateUser(int userId, string newEmail, string newRole)
+        public bool updateuser(int userid, string newemail, string newrole)
         {
-            UserUpdateDAL userupdateDAL = new UserUpdateDAL(db);
-            return userupdateDAL.UpdateUser(userId, newEmail, newRole);
+            UserUpdateDAL userupdatedal = new UserUpdateDAL(db);
+            return userupdatedal.UpdateUser(userid, newemail, newrole);
         }
+        //public bool UpdateUser(int userId, UserProfile userDetails)
+        //{
+        //    UserUpdateDAL userUpdateDAL = new UserUpdateDAL(db);
+        //    return userUpdateDAL.UpdateUser(userId, userDetails);
+        //}
+
+
         public List<UserDetailsDTO> GetAllUsers()
         {
             UserUpdateDAL userupdateDAL = new UserUpdateDAL(db);
@@ -68,5 +84,7 @@ namespace Quizzify_BLL
             bool result = userupdateDAL.AddFeedback(feedback);
             return result;
         }
+       
+
     }
 }
