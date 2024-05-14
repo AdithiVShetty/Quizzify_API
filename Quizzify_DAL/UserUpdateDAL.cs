@@ -72,38 +72,7 @@ namespace Quizzify_BLL
 
             return false;
         }
-        //public bool UpdateUser(int userId, UserProfile user)
-        //{
-        //    var existinguser = context.Users.Find(userId);
-        //    if (existinguser != null)
-        //    {
-        //        // Update the email if provided in the JSON body
-        //        if (!string.IsNullOrEmpty(user.EmailId))
-        //        {
-        //            user.EmailId = user.EmailId;
-        //        }
-
-        //        // Update the role if provided in the JSON body
-        //        if (!string.IsNullOrEmpty(user.Role))
-        //        {
-        //            var role = context.Roles.FirstOrDefault(r => r.Name == user.Role);
-        //            if (role != null)
-        //            {
-        //                existinguser.Role = role;
-        //            }
-        //            else
-        //            {
-        //                throw new ArgumentException("Role not found.", nameof(user.Role));
-        //            }
-        //        }
-
-        //        context.SaveChanges();
-        //        return true;
-        //    }
-
-        //    return false;
-        //}
-
+        
 
         public bool AddFeedback(Feedback feedback)
         {

@@ -58,7 +58,7 @@ namespace Quizzify_API.Controllers
             }
         }
         
-        [HttpPut("UpdateUser/{userId}")]
+        [HttpPut("UpdateUser")]
         public IActionResult UpdateUser(int userId, string newEmail,string newRole)
         {
             bool success = userUpdateService.updateuser(userId, newEmail, newRole);
@@ -72,20 +72,7 @@ namespace Quizzify_API.Controllers
             }
         }
 
-        //[HttpPut("UpdateUser")]
-        //public IActionResult UpdateUser(int userId, UserProfile userDetails)
-        //{
-        //    bool success = userUpdateService.UpdateUser(userId, userDetails);
-        //    if (success)
-        //    {
-        //        return Ok();
-        //    }
-        //    else
-        //    {
-        //        return NotFound();
-        //    }
-        //}
-
+        
         [HttpPost("feedback")]
         public IActionResult AddFeedback([FromBody] FeedbackDTO feedback)
         {
